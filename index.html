@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnyaBloxFruit - Cloud & Hack Blox Fruits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; line-height: 1.6; transition: background 0.5s ease; }
+        
+        /* Background & Particles */
+        .parallax-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e40af);
+            background-size: 400% 400%; animation: gradientShift 15s ease infinite;
+        }
+        .parallax-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background-image: url('https://assets.codepen.io/21542/codepen-404-page-semi.png');
+            background-size: cover; opacity: 0.1;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+        .particles-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+        }
+        .particle {
+            position: absolute; background: linear-gradient(45deg, #60a5fa, #a78bfa); border-radius: 50%; opacity: 0.6;
+            animation: float 6s infinite ease-in-out; box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(180deg); }
+        }
+        
+        /* UI Components */
+        .glass {
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+            transition: all 0.3s ease;
+        }
+        .glass:hover { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(31, 38, 135, 0.3); }
+        .neon-text {
+            text-shadow: 0 0 4px #60a5fa, 0 0 8px #60a5fa, 0 0 12px #60a5fa; transition: text-shadow 0.3s ease;
+        }
+        .neon-text:hover { text-shadow: 0 0 8px #60a5fa, 0 0 16px #60a5fa, 0 0 24px #60a5fa; }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.3), inset 0 0 15px rgba(96, 165, 250, 0.1); transition: box-shadow 0.3s ease;
+        }
+        .neon-border:hover { box-shadow: 0 0 25px rgba(96, 165, 250, 0.5), inset 0 0 20px rgba(96, 165, 250, 0.2); }
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); transform-style: preserve-3d;
+        }
+        .card-hover:hover { transform: translateY(-10px) scale(1.02) rotateX(5deg); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        
+        /* Progress Bars */
+        .progress-container { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 3px; transition: width 1s ease; }
+        
+        /* Theme Toggle */
+        .theme-toggle { position: relative; width: 50px; height: 24px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease; }
+        .theme-toggle-handle { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: white; transition: all 0.3s ease; }
+        .dark .theme-toggle-handle { transform: translateX(26px); }
+        
+        /* Countdown Timer */
+        .countdown { display: flex; justify-content: center; gap: 10px; }
+        .countdown-item { text-align: center; }
+        .countdown-number { font-size: 2rem; font-weight: bold; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 8px; min-width: 60px; }
+        .countdown-label { font-size: 0.75rem; opacity: 0.7; margin-top: 4px; }
+        
+        /* Tooltips */
+        .tooltip { position: relative; }
+        .tooltip-text {
+            visibility: hidden; width: 120px; background-color: rgba(0, 0, 0, 0.8); color: #fff; text-align: center;
+            border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%;
+            transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .countdown-number { font-size: 1.5rem; min-width: 50px; }
+        }
+    </style>
+</head>
+<body class="dark text-white">
+    <!-- Background Elements -->
+    <div class="parallax-bg"></div>
+    <div class="parallax-layer" data-speed="0.1"></div>
+    <div id="particles-container" class="particles-container"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-overlay" class="fixed inset-0 bg-gradient-to-br from-blue-900 to-purple-900 z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative">
+            <div class="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-8 h-8 bg-blue-500 rounded-full animate-ping"></div>
+            </div>
+        </div>
+        <h2 class="mt-6 text-xl font-bold text-blue-300 animate-pulse">Đang tải AnyaBloxFruit...</h2>
+        <div class="w-64 h-1 bg-gray-700 rounded-full mt-4 overflow-hidden">
+            <div id="loading-progress" class="h-full bg-gradient-to-r from-blue-500 to-purple-500" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 w-full z-50 p-3 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <a href="#" class="text-xl font-bold tracking-tight font-['Orbitron'] neon-text flex items-center">
+                <i class="fas fa-gamepad mr-2"></i>AnyaBloxFruit
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#home" class="nav-link text-sm hover:text-blue-300 tooltip" data-tooltip="Trang chủ"><i class="fas fa-home mr-1"></i> Trang chủ</a>
+                <a href="#features" class="nav-link text-sm hover:text-blue-300 tooltip" data-tooltip="Tính năng"><i class="fas fa-star mr-1"></i> Tính năng</a>
+                <a href="#downloads" class="nav-link text-sm hover:text-blue-300 tooltip" data-tooltip="Tải xuống"><i class="fas fa-download mr-1"></i> Tải xuống</a>
+                <a href="#stats" class="nav-link text-sm hover:text-blue-300 tooltip" data-tooltip="Thống kê"><i class="fas fa-chart-line mr-1"></i> Thống kê</a>
+                <a href="#about" class="nav-link text-sm hover:text-blue-300 tooltip" data-tooltip="Giới thiệu"><i class="fas fa-info-circle mr-1"></i> Giới thiệu</a>
+                <a href="#contact" class="nav-link text-sm hover:text-blue-300 tooltip" data-tooltip="Liên hệ"><i class="fas fa-envelope mr-1"></i> Liên hệ</a>
+                
+                <div id="theme-toggle" class="theme-toggle ml-4"><div class="theme-toggle-handle"></div></div>
+            </div>
+            
+            <button id="menu-toggle" class="md:hidden glass p-2 rounded-lg hover:bg-white/10" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+        </div>
+        
+        <div id="mobile-menu" class="hidden flex-col space-y-2 mt-2 md:hidden glass p-4 rounded-lg mx-4">
+            <a href="#home" class="text-sm hover:text-blue-300 flex items-center"><i class="fas fa-home mr-2"></i> Trang chủ</a>
+            <a href="#features" class="text-sm hover:text-blue-300 flex items-center"><i class="fas fa-star mr-2"></i> Tính năng</a>
+            <a href="#downloads" class="text-sm hover:text-blue-300 flex items-center"><i class="fas fa-download mr-2"></i> Tải xuống</a>
+            <a href="#stats" class="text-sm hover:text-blue-300 flex items-center"><i class="fas fa-chart-line mr-2"></i> Thống kê</a>
+            <a href="#about" class="text-sm hover:text-blue-300 flex items-center"><i class="fas fa-info-circle mr-2"></i> Giới thiệu</a>
+            <a href="#contact" class="text-sm hover:text-blue-300 flex items-center"><i class="fas fa-envelope mr-2"></i> Liên hệ</a>
+            <div class="flex items-center justify-between pt-2">
+                <span class="text-sm">Chế độ tối:</span>
+                <div id="mobile-theme-toggle" class="theme-toggle ml-2"><div class="theme-toggle-handle"></div></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
+        <div class="hero-content container mx-auto text-center px-4 z-10">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 font-['Orbitron'] neon-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">AnyaBloxFruit</span>
+            </h1>
+            
+            <div class="typewriter text-lg md:text-xl mb-6 text-blue-300 max-w-3xl mx-auto">
+                Cung cấp cloud treo game và hack Blox Fruits tốt nhất!
+            </div>
+            
+            <div class="glass p-4 rounded-xl max-w-md mx-auto mb-8 neon-border fade-in-up">
+                <h3 class="text-sm font-medium mb-2">Bản cập nhật mới sẽ ra mắt sau:</h3>
+                <div class="countdown">
+                    <div class="countdown-item"><div id="days" class="countdown-number">00</div><div class="countdown-label">Ngày</div></div>
+                    <div class="countdown-item"><div id="hours" class="countdown-number">00</div><div class="countdown-label">Giờ</div></div>
+                    <div class="countdown-item"><div id="minutes" class="countdown-number">00</div><div class="countdown-label">Phút</div></div>
+                    <div class="countdown-item"><div id="seconds" class="countdown-number">00</div><div class="countdown-label">Giây</div></div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+                <a href="https://www.youtube.com/@Anyabloxfruit" target="_blank" class="download-btn px-6 py-3 rounded-full text-base font-medium neon-border hover:shadow-lg hover:shadow-blue-500/30">
+                    <i class="fab fa-youtube mr-2"></i>Kênh YouTube
+                </a>
+                <a href="#downloads" class="glass px-6 py-3 rounded-full text-base font-medium hover:bg-white/10 hover:shadow-lg hover:shadow-purple-500/20">
+                    <i class="fas fa-download mr-2"></i>Tải ngay
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <div class="glass p-4 rounded-lg neon-border card-hover">
+                    <i class="fas fa-cloud text-3xl text-blue-400 mb-2"></i>
+                    <h3 class="text-base font-medium mb-1">Cloud Gaming</h3>
+                    <p class="text-xs text-gray-300 mb-2">Treo game 24/7 không cần máy tính</p>
+                    <div class="progress-container"><div class="progress-bar" style="width: 95%"></div></div>
+                    <span class="text-xs text-blue-400">95% hiệu quả</span>
+                </div>
+                <div class="glass p-4 rounded-lg neon-border card-hover">
+                    <i class="fas fa-code text-3xl text-purple-400 mb-2"></i>
+                    <h3 class="text-base font-medium mb-1">Auto Scripts</h3>
+                    <p class="text-xs text-gray-300 mb-2">Script tự động farm hiệu quả</p>
+                    <div class="progress-container"><div class="progress-bar" style="width: 90%"></div></div>
+                    <span class="text-xs text-purple-400">90% hiệu quả</span>
+                </div>
+                <div class="glass p-4 rounded-lg neon-border card-hover">
+                    <i class="fas fa-shield-alt text-3xl text-green-400 mb-2"></i>
+                    <h3 class="text-base font-medium mb-1">An toàn</h3>
+                    <p class="text-xs text-gray-300 mb-2">Bảo mật cao, ít rủi ro ban</p>
+                    <div class="progress-container"><div class="progress-bar" style="width: 98%"></div></div>
+                    <span class="text-xs text-green-400">98% an toàn</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="stats" class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 font-['Orbitron'] neon-text fade-in-up">Thống Kê</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                <div class="text-center glass p-4 rounded-lg neon-border fade-in-up">
+                    <div class="counter text-2xl font-bold text-blue-400 mb-1" data-target="15000">0</div>
+                    <p class="text-xs text-gray-300">Người dùng</p>
+                </div>
+                <div class="text-center glass p-4 rounded-lg neon-border fade-in-up">
+                    <div class="counter text-2xl font-bold text-purple-400 mb-1" data-target="500">0</div>
+                    <p class="text-xs text-gray-300">Scripts</p>
+                </div>
+                <div class="text-center glass p-4 rounded-lg neon-border fade-in-up">
+                    <div class="counter text-2xl font-bold text-green-400 mb-1" data-target="99">0</div>
+                    <p class="text-xs text-gray-300">% Uptime</p>
+                </div>
+                <div class="text-center glass p-4 rounded-lg neon-border fade-in-up">
+                    <div class="counter text-2xl font-bold text-yellow-400 mb-1" data-target="24">0</div>
+                    <p class="text-xs text-gray-300">Hỗ trợ 24/7</p>
+                </div>
+            </div>
+        </div>
+    </section>
+        <!-- Downloads Section -->
+    <section id="downloads" class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4 font-['Orbitron'] neon-text fade-in-up">Tải Cloud & Hack Blox Fruits</h2>
+            <p class="text-center text-gray-400 mb-8 max-w-xl mx-auto fade-in-up text-sm">
+                Công cụ được cập nhật thường xuyên với những tính năng mới nhất.
+            </p>
+            <div class="feature-grid">
+                <div class="glass rounded-xl overflow-hidden card-hover neon-border fade-in-up">
+                    <div class="relative h-40 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-cloud text-5xl text-white opacity-70"></i>
+                        <div class="absolute top-3 right-3 glass px-2 py-1 rounded-full text-xs">HOT</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium mb-2">Cloud Auto Farm Premium</h3>
+                        <p class="text-gray-400 text-xs mb-3">Tự động farm tài nguyên, boss và quests.</p>
+                        <div class="flex items-center justify-between mb-3 text-xs">
+                            <span class="text-green-400"><i class="fas fa-check mr-1"></i>Đã test</span>
+                            <span class="text-blue-400"><i class="fas fa-download mr-1"></i>2.5K</span>
+                        </div>
+                        <button class="download-btn w-full py-2 rounded-lg text-sm font-medium">
+                            <i class="fas fa-download mr-2"></i>Tải miễn phí
+                        </button>
+                    </div>
+                </div>
+                <div class="glass rounded-xl overflow-hidden card-hover neon-border fade-in-up">
+                    <div class="relative h-40 bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+                        <i class="fas fa-magic text-5xl text-white opacity-70"></i>
+                        <div class="absolute top-3 right-3 glass px-2 py-1 rounded-full text-xs">NEW</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium mb-2">Hack Auto Haki V2</h3>
+                        <p class="text-gray-400 text-xs mb-3">Kích hoạt Haki tự động với AI prediction.</p>
+                        <div class="flex items-center justify-between mb-3 text-xs">
+                            <span class="text-green-400"><i class="fas fa-shield-alt mr-1"></i>An toàn</span>
+                            <span class="text-blue-400"><i class="fas fa-download mr-1"></i>1.8K</span>
+                        </div>
+                        <button class="download-btn w-full py-2 rounded-lg text-sm font-medium">
+                            <i class="fas fa-download mr-2"></i>Tải miễn phí
+                        </button>
+                    </div>
+                </div>
+                <div class="glass rounded-xl overflow-hidden card-hover neon-border fade-in-up">
+                    <div class="relative h-40 bg-gradient-to-r from-green-600 to-blue-600 flex items-center justify-center">
+                        <i class="fas fa-cog text-5xl text-white opacity-70"></i>
+                        <div class="absolute top-3 right-3 glass px-2 py-1 rounded-full text-xs">PRO</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium mb-2">Script Game Guardian Pro</h3>
+                        <p class="text-gray-400 text-xs mb-3">Script mạnh mẽ với 50+ features.</p>
+                        <div class="flex items-center justify-between mb-3 text-xs">
+                            <span class="text-yellow-400"><i class="fas fa-star mr-1"></i>Premium</span>
+                            <span class="text-blue-400"><i class="fas fa-download mr-1"></i>3.2K</span>
+                        </div>
+                        <button class="download-btn w-full py-2 rounded-lg text-sm font-medium">
+                            <i class="fas fa-download mr-2"></i>Tải miễn phí
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 font-['Orbitron'] neon-text fade-in-up">Về AnyaBloxFruit</h2>
+            <div class="max-w-3xl mx-auto">
+                <div class="glass p-6 rounded-xl neon-border fade-in-up">
+                    <p class="text-center text-gray-300 text-sm mb-6">
+                        Chuyên cung cấp công cụ và mẹo chơi Blox Fruits với hơn 3 năm kinh nghiệm.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <i class="fas fa-users text-3xl text-blue-400 mb-2"></i>
+                            <h3 class="text-base font-medium mb-1">Cộng đồng lớn</h3>
+                            <p class="text-xs text-gray-400">15,000+ thành viên</p>
+                        </div>
+                        <div class="text-center">
+                            <i class="fas fa-code-branch text-3xl text-purple-400 mb-2"></i>
+                            <h3 class="text-base font-medium mb-1">Scripts chất lượng</h3>
+                            <p class="text-xs text-gray-400">500+ scripts an toàn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script>
+        // Enhanced Loading Screen
+        window.addEventListener('load', () => {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingProgress = document.getElementById('loading-progress');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 100) progress = 100;
+                loadingProgress.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => loadingOverlay.remove(), 500);
+                }
+            }, 100);
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+            const icon = menuToggle.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('flex');
+                    menuToggle.querySelector('i').classList.remove('fa-times');
+                    menuToggle.querySelector('i').classList.add('fa-bars');
+                }
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+        themeToggle.addEventListener('click', toggleTheme);
+        mobileThemeToggle.addEventListener('click', toggleTheme);
+        if (localStorage.getItem('theme') === 'light') document.body.classList.remove('dark');
+
+        // Particles System
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = window.innerWidth < 768 ? 30 : 80;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 5 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 5 + 3;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Parallax Effect
+        function setupParallax() {
+            const parallaxLayer = document.querySelector('.parallax-layer');
+            window.addEventListener('scroll', () => {
+                const scrollPosition = window.pageYOffset;
+                parallaxLayer.style.transform = `translateY(${scrollPosition * 0.1}px)`;
+            });
+        }
+
+        // Countdown Timer
+        function setupCountdown() {
+            const countDownDate = new Date();
+            countDownDate.setDate(countDownDate.getDate() + 7);
+            
+            const countdownFunction = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+                
+                document.getElementById("days").innerHTML = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById("hours").innerHTML = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById("minutes").innerHTML = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                document.getElementById("seconds").innerHTML = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+                
+                if (distance < 0) {
+                    clearInterval(countdownFunction);
+                    document.getElementById("days").innerHTML = "00";
+                    document.getElementById("hours").innerHTML = "00";
+                    document.getElementById("minutes").innerHTML = "00";
+                    document.getElementById("seconds").innerHTML = "00";
+                }
+            }, 1000);
+        }
+
+        // Animations
+        function setupAnimations() {
+            const fadeElements = document.querySelectorAll('.fade-in-up');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            fadeElements.forEach(el => observer.observe(el));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setupParallax();
+            setupCountdown();
+            setupAnimations();
+            
+            // Tooltips
+            const tooltips = document.querySelectorAll('.tooltip');
+            tooltips.forEach(tooltip => {
+                const tooltipText = document.createElement('span');
+                tooltipText.classList.add('tooltip-text');
+                tooltipText.textContent = tooltip.dataset.tooltip;
+                tooltip.appendChild(tooltipText);
+            });
+        });
+    </script>
+</body>
+</html>
